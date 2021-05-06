@@ -1,0 +1,1 @@
+select _FROM as 'from' from chats;

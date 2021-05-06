@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Document</title>
+		<link
+			rel="stylesheet"
+			href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+			integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+			crossorigin="anonymous"
+		/>
+
+		<style>
+			html,
+			body {
+				height: 100%;
+				width: 100%;
+				height: 100vh;
+				width: 100vw;
+				margin: 0;
+				background: green;
+				display: flex;
+				flex-direction: column;
+			}
+
+			#chat_window {
+				/* background: lightblue; */
+				overflow: scroll;
+				height: 500px;
+				border-bottom: 1px ridge rgba(128, 128, 128, 0.274);
+				border-top: 1px ridge rgba(128, 128, 128, 0.274);
+				margin-bottom: 10px;
+				/* flex: 1; */
+			}
+
+			/* .header {
+                height: 5%;
+            } */
+
+			#chat_window::-webkit-scrollbar {
+				display: none;
+			}
+
+			.speaker {
+				color: blue;
+				font-size: 15px;
+			}
+
+			.text {
+				color: black;
+				font-size: 15px;
+			}
+
+			.footer {
+				flex: 1;
+				display: flex;
+			}
+
+			.send-button {
+				margin: 0 5px 0 5px;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			<div class="jumbotron header">
+				<div>
+					<label for="from">From</label>
+					<input
+						type="username"
+						class="form-control"
+						id="from_box"
+						placeholder="John"
+					/>
+					<small id="usernameHelp" class="text-muted"
+						>This will appear to your reciever.</small
+					>
+				</div>
+				<div>
+					<label for="to">To</label>
+					<input
+						type="username"
+						class="form-control"
+						id="to_box"
+						placeholder="Jennifer"
+					/>
+					<!-- <small id="usernameHelp" class="text-muted">This will appear with your messages.</small> -->
+				</div>
+				<div>
+					<button
+						class="btn btn-primary"
+						id="load-button"
+						style="margin: 10px"
+					>
+						Load
+					</button>
+				</div>
+			</div>
+		</div>
+
+		<script src="/socket.io/socket.io.js"></script>
+		<script>
+			var socket = io();
+			console.log("Hello World");
+
+			socket.on("message", function (data) {
+				console.log(data);
+				socket.emit("message", "Okay!");
+			});
+
+			header = document.querySelector(".header");
+
+			fromBox = document.querySelector("#from_box");
+			toBox = document.querySelector("#to_box");
+			loadButton = document.querySelector("#load-button");
+
+			function load() {
+				from = fromBox.value;
+				if (from === "") {
+					alert("Your username is required!");
+					return;
+				}
+				to = toBox.value;
+				// if (to === "") {
+				// 	alert("Reciever username is required!");
+				// 	return;
+				// }
+
+				var xhr = new XMLHttpRequest();
+				// we defined the xhr
+
+				xhr.onreadystatechange = function () {
+					if (this.readyState != 4) return;
+
+					if (this.status == 200) {
+						// var data = JSON.parse(this.responseText);
+						console.log(this.responseText);
+
+						// we get the returned data
+					}
+
+					// end of state change: it can be after some time (async)
+				};
+
+				xhr.open("POST", "/chat", true);
+				postData = {
+					username: from,
+				};
+				xhr.send(postData);
+			}
+
+			loadButton.addEventListener("click", load);
+			fromBox.addEventListener("keydown", function (event) {
+				if (event.key === "Enter") {
+					load();
+				}
+			});
+			toBox.addEventListener("keydown", function (event) {
+				if (event.key === "Enter") {
+					load();
+				}
+			});
+
+			document.addEventListener("DOMContentLoaded", function () {
+				loadButton.disabled = false;
+			});
+		</script>
+	</body>
+</html>
