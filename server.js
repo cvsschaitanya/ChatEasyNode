@@ -5,7 +5,7 @@ var http = require("http");
 
 var app = express();
 var httpServer = http.createServer(app);
-httpServer.listen(13000);
+httpServer.listen(3000);
 
 var io = require("socket.io")().listen(httpServer);
 
@@ -15,7 +15,7 @@ router.get("/", function (req, res) {
 });
 
 router.post("/chat", function (req, res) {
-	username = req['username']
+	username = req["username"];
 	res.sendFile(path.join(__dirname, "chat.html"));
 });
 
