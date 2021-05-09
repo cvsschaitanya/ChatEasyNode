@@ -78,42 +78,32 @@
 						>This will appear to your reciever.</small
 					>
 				</div>
-				<div>
-					<label for="to">To</label>
-					<input
-						type="username"
-						class="form-control"
-						id="to_box"
-						placeholder="Jennifer"
-					/>
-					<!-- <small id="usernameHelp" class="text-muted">This will appear with your messages.</small> -->
-				</div>
+
 				<div>
 					<button
 						class="btn btn-primary"
 						id="load-button"
 						style="margin: 10px"
 					>
-						Load
+						Signin
 					</button>
 				</div>
 			</div>
 		</div>
 
-		<script src="/socket.io/socket.io.js"></script>
+		<!-- <script src="/socket.io/socket.io.js"></script> -->
 		<script>
-			var socket = io();
-			console.log("Hello World");
+			// var socket = io();
+			// console.log("Hello World");
 
-			socket.on("message", function (data) {
-				console.log(data);
-				socket.emit("message", "Okay!");
-			});
+			// socket.on("message", function (data) {
+			// 	console.log(data);
+			// 	socket.emit("message", "Okay!");
+			// });
 
 			header = document.querySelector(".header");
 
 			fromBox = document.querySelector("#from_box");
-			toBox = document.querySelector("#to_box");
 			loadButton = document.querySelector("#load-button");
 
 			function load() {
@@ -122,42 +112,36 @@
 					alert("Your username is required!");
 					return;
 				}
-				to = toBox.value;
-				// if (to === "") {
-				// 	alert("Reciever username is required!");
-				// 	return;
-				// }
 
 				var xhr = new XMLHttpRequest();
 				// we defined the xhr
-
+				xhr.open("POST", "/chat", true);
+				xhr.setRequestHeader(
+					"Content-type",
+					// "application/x-www-form-urlencoded",
+					"application/json;charset=UTF-8"
+				);
 				xhr.onreadystatechange = function () {
 					if (this.readyState != 4) return;
 
 					if (this.status == 200) {
 						// var data = JSON.parse(this.responseText);
 						console.log(this.responseText);
-
-						// we get the returned data
+						window.location.replace("/chat");
 					}
 
 					// end of state change: it can be after some time (async)
 				};
 
-				xhr.open("POST", "/chat", true);
 				postData = {
 					username: from,
 				};
-				xhr.send(postData);
+				// xhr.send("username=" + from);
+				xhr.send(JSON.stringify(postData));
 			}
 
 			loadButton.addEventListener("click", load);
-			fromBox.addEventListener("keydown", function (event) {
-				if (event.key === "Enter") {
-					load();
-				}
-			});
-			toBox.addEventListener("keydown", function (event) {
+			document.addEventListener("keydown", function (event) {
 				if (event.key === "Enter") {
 					load();
 				}

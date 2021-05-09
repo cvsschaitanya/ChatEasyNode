@@ -1,7 +1,10 @@
 var path = require("path");
 var express = require("express");
-var router = express.Router();
+var theCookieParser = require("cookie-parser");
+var ParseCookieTool = require("cookie-parse");
 var http = require("http");
+
+var router = express.Router();
 
 var app = express();
 var httpServer = http.createServer(app);
@@ -12,13 +15,24 @@ var io = require("socket.io")().listen(httpServer);
 
 //assuming app is express Object.
 router.get("/", function (req, res) {
+	res.sendFile(path.join(__dirname, "index.html"));
+});
+
+router.get("/chat", function (req, res) {
+	const cookie = req.cookies;
+	console.log(cookie);
 	res.sendFile(path.join(__dirname, "chat.html"));
 });
 
 router.post("/chat", function (req, res) {
-	username = req["username"];
-	res.sendFile(path.join(__dirname, "chat.html"));
+	username = req.body["username"];
+	res.cookie("session-id", username);
+	res.send("OK cool");
 });
+
+app.use(theCookieParser());
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 
 app.use("/", router);
 
@@ -48,18 +62,25 @@ function addChat(chat) {
 	});
 }
 
-connected_sockets = [];
+socketOf = {};
+userOf = {};
 var myip;
 
 io.on("connection", (sock) => {
-	console.log("A user connected");
-	connected_sockets.push(sock);
+	username = ParseCookieTool.parse(sock.request.headers.cookie)["session-id"];
+	console.log(username + " connected");
+	userOf[sock["id"]] = username;
+	socketOf[username] = sock;
+	// console.log(socketOf);
+	// console.log(userOf);
 
 	sock.on("disconnect", () => {
-		i = connected_sockets.indexOf(sock);
-		if (i > -1) connected_sockets.splice(sock, i);
-
-		console.log("A user disconnected");
+		var username = userOf[sock["id"]];
+		delete socketOf[username];
+		delete userOf[sock["id"]];
+		console.log(username + " disconnected");
+		// console.log(socketOf);
+		// console.log(userOf);
 	});
 
 	sock.on("message", function (data) {
@@ -67,15 +88,19 @@ io.on("connection", (sock) => {
 		this.emit("message", "Thank you");
 	});
 
+	sock.on("naming", function (data) {
+		this.emit("naming", userOf[this["id"]]);
+	});
+
 	sock.on("newChat", (chat) => {
 		console.log("Received a new chat");
 		console.log(chat);
 		addChat(chat);
 
-		console.log("Sending it to " + connected_sockets.length + " people");
-		connected_sockets.forEach((socket) => {
-			socket.emit("newChatList", [chat]);
-		});
+		if (chat["_FROM"] in socketOf)
+			socketOf[chat["_FROM"]].emit("newChatList", [chat]);
+		if (chat["_TO"] in socketOf)
+			socketOf[chat["_TO"]].emit("newChatList", [chat]);
 	});
 
 	sock.on("extractChatsBetn", (couple) => {

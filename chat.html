@@ -69,7 +69,7 @@
         <div class="jumbotron header">
             <div>
                 <label for="from">From</label>
-                <input type="username" class="form-control" id="from_box" placeholder="John">
+                <input type="username" class="form-control" id="from_box" placeholder="John" disabled>
                 <small id="usernameHelp" class="text-muted">This will appear to your reciever.</small>
             </div>
             <div>
@@ -101,6 +101,11 @@
 		<script>
             var socket = io();
 			console.log("Hello World");
+
+            socket.emit("naming");
+            socket.on('naming',(name)=>{
+                fromBox.value = name;
+            })
 
             socket.on("message", function (data) {
 				console.log(data);
@@ -135,7 +140,7 @@
                 }
 
                 socket.emit("extractChatsBetn",[from,to]);
-                    
+                chats.innerHTML = "";
             } 
 
             function getMessageHTML(username, message) {
@@ -153,10 +158,17 @@
                 
                 chatlist.forEach(chat => {
                     console.log(chat);
-                    HTML = getMessageHTML(chat['_FROM'], chat['_MESSAGE']);
-                    chats.innerHTML += HTML;
-                    allP = document.querySelectorAll(".text");
-                    allP[allP.length - 1].scrollIntoView();
+                    from = fromBox.value;
+                    to = toBox.value;
+                
+                    if((chat['_FROM']===from && chat['_TO']===to)
+                        || (chat['_FROM']===to && chat['_TO']===from))
+                    {
+                        HTML = getMessageHTML(chat['_FROM'], chat['_MESSAGE']);
+                        chats.innerHTML += HTML;
+                        allP = document.querySelectorAll(".text");
+                        allP[allP.length - 1].scrollIntoView();
+                    }
                 });
                 if(first){
                     sendButton.disabled = false;
