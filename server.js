@@ -5,7 +5,8 @@ var http = require("http");
 
 var app = express();
 var httpServer = http.createServer(app);
-httpServer.listen(3000);
+
+httpServer.listen(process.env.PORT || 3000);
 
 var io = require("socket.io")().listen(httpServer);
 
