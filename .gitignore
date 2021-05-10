@@ -1,4 +1,4 @@
-db/chats.db
+# db/chats.db
 node_modules/.package-lock.json
 node_modules/.bin/node-pre-gyp
 node_modules/@mapbox/node-pre-gyp/CHANGELOG.md
