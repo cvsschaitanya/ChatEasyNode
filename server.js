@@ -20,7 +20,11 @@ router.get("/", function (req, res) {
 
 router.get("/chat", function (req, res) {
 	const cookie = req.cookies;
+	console.log("The cookie is ");
 	console.log(cookie);
+
+	if (cookie["session-id"] == null) res.redirect("/");
+
 	res.sendFile(path.join(__dirname, "chat.html"));
 });
 
