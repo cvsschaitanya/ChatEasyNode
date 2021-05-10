@@ -104,35 +104,41 @@
 		<script>
             var socket = io();
 			console.log("Hello World");
-
-            socket.emit("naming");
+            
             socket.on('naming',(name)=>{
+                console.log('Your name is '+name)
                 fromBox.value = name;
-            })
-
+            });
+            socket.emit("naming");
+            
             socket.on("message", function (data) {
-				console.log(data);
+                console.log(data);
                 socket.emit("message","Okay!")
 			});
             
 			header = document.querySelector(".header");
             chats = document.querySelector("#chat_window");
             footer = document.querySelector(".footer");
-
+            
             fromBox = document.querySelector("#from_box");
             toBox = document.querySelector("#to_box");
             signoutButton = document.querySelector("#signout-button");
             loadButton = document.querySelector("#load-button");
-
+            
             messagebox = document.querySelector("#message_box");
             sendButton = document.querySelector("#send-button");
-
+            
             chats.style.height = (window.innerHeight - header.offsetHeight - footer.offsetHeight - 150) + "px";
-
+            
             var first = true;
             
             function deleteCookie(name){
                 document.cookie = name+"=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+            }
+
+            function signout(){
+                // deleteCookie('connect.sid');
+                window.location.replace("/signout");
             }
             
             function load() {
@@ -147,7 +153,7 @@
                     return;
                 }
 
-                socket.emit("extractChatsBetn",[from,to]);
+                socket.emit("extract-chats-between",[from,to]);
                 chats.innerHTML = "";
             } 
 
@@ -162,8 +168,13 @@
                     "</div>";
             }
 
-            socket.on("newChatList", function (chatlist) {
-                
+            socket.on("hard-resign", signout);
+            
+            socket.on("soft-resign", function () {
+                window.location.replace("/another-login");
+            });
+            
+            socket.on("new-chat-list", function (chatlist) {
                 chatlist.forEach(chat => {
                     console.log(chat);
                     from = fromBox.value;
@@ -193,17 +204,15 @@
 
                 console.log('sending message');
 
-                socket.emit('newChat',{
+                socket.emit('new-chat',{
                     _FROM:from,
                     _TO:to,
                     _MESSAGE:message,
                 });
                 messagebox.value = "";
             }
-
-            signoutButton.addEventListener('click', ()=>{
-                deleteCookie('session-id');window.location.replace("/chat");
-            });
+            
+            signoutButton.addEventListener('click', signout);
             loadButton.addEventListener('click', load);
             fromBox.addEventListener('keydown', function(event) {
                 if (event.key === "Enter") {

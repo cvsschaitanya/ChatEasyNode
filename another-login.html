@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>ChatEasy</title>
+		<link
+			rel="stylesheet"
+			href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+			integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+			crossorigin="anonymous"
+		/>
+
+		<style>
+			html,
+			body {
+				height: 100%;
+				width: 100%;
+				height: 100vh;
+				width: 100vw;
+				margin: 0;
+				background: green;
+				display: flex;
+				flex-direction: column;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			<div class="jumbotron header">
+				Another login has been detected from the same browser.
+				<div>
+					<button
+						class="btn btn-primary"
+						id="get-back-button"
+						style="margin: 10px"
+					>
+						Get Back Here
+					</button>
+				</div>
+			</div>
+		</div>
+
+		<script>
+			getBackButton = document.querySelector("#get-back-button");
+
+			getBackButton.addEventListener("click", () => {
+				window.location.replace("/");
+			});
+		</script>
+	</body>
+</html>

@@ -1,7 +1,21 @@
-var path = require("path");
-var express = require("express");
-var theCookieParser = require("cookie-parser");
-var ParseCookieTool = require("cookie-parse");
+const path = require("path");
+const express = require("express");
+// const theCookieParser = require("cookie-parser");
+// const ParseCookieTool = require("cookie-parse");
+const ExpressSession = require("express-session");
+const memstore = new ExpressSession.MemoryStore();
+const session = ExpressSession({
+	resave: false,
+	saveUninitialized: false,
+	secret: "my super secret",
+	cookie: {
+		maxAge: 1000 * 60 * 60 * 24,
+		sameSite: true,
+		secure: false,
+	},
+	store: memstore,
+});
+
 var http = require("http");
 
 var router = express.Router();
@@ -15,26 +29,40 @@ var io = require("socket.io")().listen(httpServer);
 
 //assuming app is express Object.
 router.get("/", function (req, res) {
-	const cookie = req.cookies;
+	const username = req.session["username"];
 
-	if (cookie["session-id"] != null) res.redirect("/chat");
+	if (username) res.redirect("/chat");
 	else res.sendFile(path.join(__dirname, "index.html"));
 });
 
 router.get("/chat", function (req, res) {
-	const cookie = req.cookies;
+	const username = req.session["username"];
 
-	if (cookie["session-id"] == null) res.redirect("/");
+	if (!username) res.redirect("/");
 	else res.sendFile(path.join(__dirname, "chat.html"));
+});
+
+router.get("/another-login", function (req, res) {
+	res.sendFile(path.join(__dirname, "another-login.html"));
+});
+
+router.get("/signout", function (req, res) {
+	memstore.destroy(req.session["id"], () => {
+		res.redirect("/");
+	});
 });
 
 router.post("/chat", function (req, res) {
 	username = req.body["username"];
-	res.cookie("session-id", username);
-	res.send("OK cool");
+
+	req.session.username = username;
+	res.send("OK cool!");
+	// res.redirect("/chat");
 });
 
-app.use(theCookieParser());
+// app.use(theCookieParser());
+
+app.use(session);
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
@@ -68,23 +96,37 @@ function addChat(chat) {
 
 socketOf = {};
 userOf = {};
+sessionOf = {};
 var myip;
 
+var sharedSession = require("express-socket.io-session");
+io.use(sharedSession(session));
+
 io.on("connection", (sock) => {
-	username = ParseCookieTool.parse(sock.request.headers.cookie)["session-id"];
+	username = sock.handshake.session.username;
 	console.log(username + " connected");
+
+	if (username in socketOf) {
+		console.log(`${username} already exists`);
+		userOf[socketOf[username]["id"]] = null;
+
+		if (sessionOf[username] === sock.handshake.session.id) {
+			socketOf[username].emit("soft-resign");
+		} else {
+			socketOf[username].emit("hard-resign");
+		}
+	}
+
 	userOf[sock["id"]] = username;
 	socketOf[username] = sock;
-	// console.log(socketOf);
-	// console.log(userOf);
+	sessionOf[username] = sock.handshake.session.id;
 
 	sock.on("disconnect", () => {
 		var username = userOf[sock["id"]];
-		delete socketOf[username];
-		delete userOf[sock["id"]];
-		console.log(username + " disconnected");
-		// console.log(socketOf);
-		// console.log(userOf);
+		if (socketOf[username]) delete socketOf[username];
+		if (userOf[sock["id"]]) delete userOf[sock["id"]];
+		if (sessionOf[username]) delete sessionOf[username];
+		if (username) console.log(username + " disconnected");
 	});
 
 	sock.on("message", function (data) {
@@ -96,18 +138,18 @@ io.on("connection", (sock) => {
 		this.emit("naming", userOf[this["id"]]);
 	});
 
-	sock.on("newChat", (chat) => {
+	sock.on("new-chat", (chat) => {
 		console.log("Received a new chat");
 		console.log(chat);
 		addChat(chat);
 
 		if (chat["_FROM"] in socketOf)
-			socketOf[chat["_FROM"]].emit("newChatList", [chat]);
+			socketOf[chat["_FROM"]].emit("new-chat-list", [chat]);
 		if (chat["_TO"] in socketOf)
-			socketOf[chat["_TO"]].emit("newChatList", [chat]);
+			socketOf[chat["_TO"]].emit("new-chat-list", [chat]);
 	});
 
-	sock.on("extractChatsBetn", (couple) => {
+	sock.on("extract-chats-between", (couple) => {
 		console.log("extract requested for " + couple);
 		db.serialize(() => {
 			db.all(
@@ -118,7 +160,7 @@ io.on("connection", (sock) => {
 					else {
 						console.log("extracted ");
 						console.log(rows);
-						sock.emit("newChatList", rows);
+						sock.emit("new-chat-list", rows);
 					}
 				}
 			);
