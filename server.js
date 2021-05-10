@@ -15,17 +15,17 @@ var io = require("socket.io")().listen(httpServer);
 
 //assuming app is express Object.
 router.get("/", function (req, res) {
-	res.sendFile(path.join(__dirname, "index.html"));
+	const cookie = req.cookies;
+
+	if (cookie["session-id"] != null) res.redirect("/chat");
+	else res.sendFile(path.join(__dirname, "index.html"));
 });
 
 router.get("/chat", function (req, res) {
 	const cookie = req.cookies;
-	console.log("The cookie is ");
-	console.log(cookie);
 
 	if (cookie["session-id"] == null) res.redirect("/");
-
-	res.sendFile(path.join(__dirname, "chat.html"));
+	else res.sendFile(path.join(__dirname, "chat.html"));
 });
 
 router.post("/chat", function (req, res) {

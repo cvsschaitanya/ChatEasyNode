@@ -69,8 +69,11 @@
         <div class="jumbotron header">
             <div>
                 <label for="from">From</label>
-                <input type="username" class="form-control" id="from_box" placeholder="John" disabled>
+                <input type="username" class="form-control" id="from_box" placeholder="---" disabled>
                 <small id="usernameHelp" class="text-muted">This will appear to your reciever.</small>
+            </div>
+            <div>
+                <button class="btn btn-primary" id="signout-button" style="margin: 10px">Sign Out</button>
             </div>
             <div>
                 <label for="to">To</label>
@@ -118,6 +121,7 @@
 
             fromBox = document.querySelector("#from_box");
             toBox = document.querySelector("#to_box");
+            signoutButton = document.querySelector("#signout-button");
             loadButton = document.querySelector("#load-button");
 
             messagebox = document.querySelector("#message_box");
@@ -126,7 +130,11 @@
             chats.style.height = (window.innerHeight - header.offsetHeight - footer.offsetHeight - 150) + "px";
 
             var first = true;
-
+            
+            function deleteCookie(name){
+                document.cookie = name+"=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+            }
+            
             function load() {
                 from = fromBox.value;
                 if (from === "") {
@@ -193,6 +201,9 @@
                 messagebox.value = "";
             }
 
+            signoutButton.addEventListener('click', ()=>{
+                deleteCookie('session-id');window.location.replace("/chat");
+            });
             loadButton.addEventListener('click', load);
             fromBox.addEventListener('keydown', function(event) {
                 if (event.key === "Enter") {
