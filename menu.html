@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Menu</title>
+
+	<style>
+		body {
+			background: rgb(151, 213, 238);
+		}
+
+		.vertical-scroll-menu {
+			width: 200px;
+			height: 200px;
+			overflow: auto;
+		}
+
+		.vertical-scroll-menu div {
+			background-color: #eee;
+			color: black;
+			display: block;
+			padding: 12px;
+			text-decoration: none;
+		}
+
+		.vertical-scroll-menu div:hover {
+			background-color: #ccc;
+		}
+
+		.vertical-scroll-menu div.active {
+			background-color: rgba(0, 128, 121, 0.418);
+			;
+			color: white;
+		}
+
+		.speaker {
+			color: blue;
+			font-size: 15px
+		}
+
+		.text {
+			color: black;
+			font-size: 15px
+		}
+
+		.blank {
+			width: 500px;
+			height: 500px;
+			background-color: white
+		}
+
+		.message {
+			overflow: hidden;
+			margin: 2px 4px;
+		}
+
+		.message-left,
+		.message-right {
+			border-radius: 10px;
+			max-width: 60%;
+			word-wrap: break-word;
+			padding: 10px;
+			/* position: absolute; */
+		}
+
+		.message-left {
+			background-color: rgba(0, 0, 0, 0.233);
+			float: left;
+		}
+
+		.message-right {
+			background-color: rgb(6, 6, 255);
+			color: white;
+			float: right;
+		}
+	</style>
+</head>
+
+<body>
+	<h1>Vertical Scroll Menu</h1>
+
+
+
+	<div class="blank">
+		<div class='message'>
+
+			<div class="message-left">
+				Hello Hello Hello Hello Hello Hello Hello Hello Hello Hello Hello Hello Hello Hello Hello Hello
+				Hello Hello Hello Hello
+			</div>
+		</div>
+
+		<div class='message'>
+			<div class="message-right">
+				Hello Hello Hello Hello Hello Hello Hello Hello Hello Hello Hello Hello Hello Hello
+				Hello Hello
+				Hello Hello Hello Hello
+			</div>
+		</div>
+	</div>
+
+
+	<script>
+		header = document.querySelector("h1");
+
+		// class vertical_scroll_list {
+		// 	constructor(id, parent, before) {
+		// 		this.element = document.createElement("div");
+		// 		this.element.id = id;
+		// 		this.element.classList.add("vertical-scroll-menu");
+		// 		this.itemList = [];
+		// 		this.activeItemIndex = -1;
+		// 		if (before === null) {
+		// 			parent.appendChild(this.element);
+		// 		} else {
+		// 			parent.insertBefore(this.element, before);
+		// 		}
+		// 	}
+
+		// 	addItem(item) {
+		// 		var listitem = document.createElement("div");
+		// 		listitem.href = "#";
+		// 		listitem.innerText = item;
+		// 		listitem.parent_scroll_view = this;
+		// 		listitem.addEventListener("click", function () {
+		// 			// console.log(this);
+		// 			this.classList.add("active");
+		// 			var parent = this.parent_scroll_view;
+		// 			if (parent.activeItemIndex >= 0)
+		// 				parent.itemList[
+		// 					parent.activeItemIndex
+		// 				].classList.remove("active");
+		// 			parent.activeItemIndex = parent.itemList.indexOf(this);
+		// 			header.innerText = this.innerText;
+		// 		});
+		// 		this.itemList.push(listitem);
+		// 		this.element.appendChild(listitem);
+		// 	}
+		// }
+
+		// list = new vertical_scroll_list("ABC");
+		// list.addItem("A");
+		// list.addItem("B");
+		// list.addItem("C");
+		// list.addItem("D");
+
+		function getMessageElement(message, side) {
+			let element = document.createElement("div");
+			element.classList.add("message");
+			let message_text_element = document.createElement("div");
+
+			message_text_element.classList.add("message-" + side);
+			let textnode = document.createTextNode(message);
+			message_text_element.appendChild(textnode);
+
+			element.appendChild(message_text_element);
+
+			return element;
+		}
+
+		// document.querySelector(".blank").innerHTML += getMessageHTML("Chaitanya", "Hello");
+		document.querySelector(".blank").appendChild(getMessageElement("Hello1", "left"));
+		document.querySelector(".blank").appendChild(getMessageElement("Hello2", "right"));
+		document.querySelector(".blank").appendChild(getMessageElement("Hello3", "right"));
+		document.querySelector(".blank").appendChild(getMessageElement("Hello4", "left"));
+		document.querySelector(".blank").appendChild(getMessageElement("Hello5", "right"));
+
+
+
+	</script>
+</body>
+
+</html>

@@ -215,11 +215,27 @@ io.on("connection", (sock) => {
 
 	sock.on("message", function (data) {
 		console.log("Client says: " + data);
-		this.emit("message", "Thank you");
+		console.log(this);
+		sock.emit("message", "Thank you");
 	});
 
-	sock.on("naming", function (data) {
-		this.emit("naming", userOf[this["id"]]);
+	sock.on("init", (data) => {
+		// console.log(this);
+
+		db.serialize(() => {
+			db.all("SELECT username FROM _USERS;", [], (err, rows) => {
+				let users = [];
+				for (i = 0; i < rows.length; ++i) {
+					users.push(rows[i].username);
+				}
+				init_reply_data = {
+					name: userOf[sock["id"]],
+					contacts: users,
+				};
+				console.log(init_reply_data);
+				sock.emit("init-reply", init_reply_data);
+			});
+		});
 	});
 
 	sock.on("new-chat", (chat) => {
