@@ -23,24 +23,30 @@
             flex-direction: column;
         }
 
+        main-space {
+            padding: 100px;
+        }
+
         .main-space>table {
             width: 100%;
             margin-bottom: 10px;
         }
 
-        #user-details {
-            background-color: rgba(5, 5, 15, 0.534)
+        .header {
+            background-color: yellow;
+            font-size: 140%;
         }
 
-        #user-details {
-            border-right: 5px ridge blue;
-            border-bottom: 5px ridge blue
-        }
+        #my-details {}
+
+        #contact-details {}
 
         .scroll-view {
             /* background: lightblue; */
             overflow: scroll;
             height: 500px;
+            border-bottom: 1px ridge rgba(128, 128, 128, 0.274);
+            border-top: 1px ridge rgba(128, 128, 128, 0.274);
             padding: 0px;
             /* flex: 1; */
         }
@@ -60,6 +66,7 @@
             display: block;
             padding: 12px;
             text-decoration: none;
+            border-bottom: 1px ridge rgba(128, 128, 128, 0.274);
         }
 
         #contact-list div:hover {
@@ -108,74 +115,59 @@
         .send-button {
             margin: 0 5px 0 5px;
         }
+
+        .big-input {}
     </style>
 </head>
 
 <body>
-    <div class="full">
-        <div class="jumbotron header">
-            <div>
-                <label for="from">From</label>
-                <input type="username" class="form-control" id="from_box" placeholder="---" disabled>
-                <small id="usernameHelp" class="text-muted">This will appear to your reciever.</small>
-            </div>
-            <div>
-                <button class="btn btn-primary" id="signout-button" style="margin: 10px">Sign Out</button>
-            </div>
-            <div>
-                <label for="to">To</label>
-                <input type="username" class="form-control" id="to_box" placeholder="Jennifer">
-                <!-- <small id="usernameHelp" class="text-muted">This will appear with your messages.</small> -->
-            </div>
-            <div>
-                <button class="btn btn-primary" id="load-button" style="margin: 10px">Load</button>
-            </div>
-        </div>
+    <div class="main-space">
+        <table>
+            <tr class="header">
+                <td style="width: 20%;">
+                    <div id="my-details">
+                        Hello
+                        <br> Chaitanya
+                    </div>
+                </td>
+                <td style="width: 80%;">
+                    <div id="contact-details">
+                        <span>
+                            Neeraj
+                        </span>
+                        <span>
+                            <button class="btn btn-primary" id="signout-button" style="margin: 10px">
+                                Sign Out</button>
+                        </span>
 
-        <div class=" main-space">
-            <table>
-                <tr>
-                    <td style="width: 20%;">
-                        <div id='user-details'>
-                            Hello Chaitanya
-                        </div>
-                    </td>
-                    <td style="width: 80%;">
-                        <div id='contact-details'>
-                            Neearj
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td style="width: 20%;">
-                        <div id="contact-list" class="container scroll-view">
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td style="width: 20%;">
+                    <input class="form-control" id="search-box" placeholder="Search">
 
-                        </div>
-                    </td>
-                    <td style="width: 80%;">
-                        <div id="chat_window" class="container scroll-view">
+                    <div id="contact-list" class="scroll-view">
+                        <div>Chaitanya</div>
+                        <div>Neeraj</div>
+                    </div>
+                </td>
+                <td style="width: 80%;">
+                    <div id="chat_window" class="scroll-view">
 
-                        </div>
-                    </td>
-                </tr>
-            </table>
-            <div class="footer">
-                <input class="form-control" id="message_box" placeholder="Type a message">
-                <button class="btn btn-primary send-button" id="send-button" disabled>Send</button>
-            </div>
-        </div>
+                    </div>
+                    <div class="footer">
+                        <input class="form-control input-lg" id="message_box" placeholder="Type a message">
+                        <button class="btn btn-primary send-button" id="send-button" disabled>Send</button>
+                    </div>
+                </td>
+            </tr>
+        </table>
     </div>
 
 
-    <script src="/socket.io/socket.io.js"></script>
     <script>
-        var socket = io();
         console.log("Hello World");
-
-        socket.on("message", function (data) {
-            console.log(data);
-            socket.emit("message", "Okay!")
-        });
 
         header = document.querySelector(".header");
         chats = document.querySelector("#chat_window");
@@ -217,17 +209,7 @@
             }
         }
 
-        contact_list_view.element.style.height = chats.style.height = (window.innerHeight - header.offsetHeight - footer.offsetHeight - 150) + "px";
-
-        socket.on('init-reply', (data) => {
-            console.log('Your name is ' + data['name'])
-            fromBox.value = data['name'];
-            data['contacts'].forEach((name) => {
-                contact_list_view.addItem(name);
-            });
-        });
-        socket.emit("init");
-
+        contact_list_view.element.style.height = chats.style.height = (window.innerHeight - header.offsetHeight - footer.offsetHeight - 10) + "px";
 
         var first = true;
 
@@ -280,37 +262,6 @@
 
             return element;
         }
-
-        socket.on("hard-resign", signout);
-
-        socket.on("soft-resign", function () {
-            window.location.replace("/another-login");
-        });
-
-        socket.on("new-chat-list", function (chatlist) {
-            chatlist.forEach(chat => {
-                console.log(chat);
-                from = fromBox.value;
-                to = toBox.value;
-
-                if (chat['_FROM'] === from && chat['_TO'] === to) {
-                    chats.appendChild(getMessageElement(chat['_MESSAGE'], 'right'))
-                    allMessages = document.querySelectorAll(".message");
-                    allMessages[allMessages.length - 1].scrollIntoView();
-                }
-                else if (chat['_FROM'] === to && chat['_TO'] === from) {
-                    chats.appendChild(getMessageElement(chat['_MESSAGE'], 'left'))
-                    allMessages = document.querySelectorAll(".message");
-                    allMessages[allMessages.length - 1].scrollIntoView();
-                }
-            });
-            if (first) {
-                sendButton.disabled = false;
-                messagebox.focus();
-                first = false;
-            }
-        });
-
 
         function send() {
             message = messagebox.value;

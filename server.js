@@ -54,6 +54,10 @@ router.get("/signout", function (req, res) {
 	});
 });
 
+router.get("/other", function (req, res) {
+	res.sendFile(path.join(__dirname, "build/index.html"));
+});
+
 router.post("/signin", function (req, res) {
 	username = req.body["username"];
 	password = req.body["password"];
@@ -146,6 +150,8 @@ router.post("/register", function (req, res) {
 
 // app.use(theCookieParser());
 
+app.use("/public", express.static("public"));
+app.use("/static", express.static("build/static"));
 app.use(session);
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -245,7 +251,7 @@ io.on("connection", (sock) => {
 
 		if (chat["_FROM"] in socketOf)
 			socketOf[chat["_FROM"]].emit("new-chat-list", [chat]);
-		if (chat["_TO"] in socketOf)
+		if (chat["_FROM"] != chat["_TO"] && chat["_TO"] in socketOf)
 			socketOf[chat["_TO"]].emit("new-chat-list", [chat]);
 	});
 

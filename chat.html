@@ -106,43 +106,45 @@
 
 <body>
     <div class="container">
-        <div class="jumbotron header">
-            <div>
-                <label for="from">From</label>
-                <input type="username" class="form-control" id="from_box" placeholder="---" disabled>
-                <small id="usernameHelp" class="text-muted">This will appear to your reciever.</small>
+        <div class="jumbotron">
+            <div class="header">
+                <div>
+                    <label for="from">From</label>
+                    <input type="username" class="form-control" id="from_box" placeholder="---" disabled>
+                    <small id="usernameHelp" class="text-muted">This will appear to your reciever.</small>
+                </div>
+                <div>
+                    <button class="btn btn-primary" id="signout-button" style="margin: 10px">Sign Out</button>
+                </div>
+                <div>
+                    <label for="to">To</label>
+                    <input type="username" class="form-control" id="to_box" placeholder="Jennifer">
+                    <!-- <small id="usernameHelp" class="text-muted">This will appear with your messages.</small> -->
+                </div>
+                <div>
+                    <button class="btn btn-primary" id="load-button" style="margin: 10px">Load</button>
+                </div>
             </div>
-            <div>
-                <button class="btn btn-primary" id="signout-button" style="margin: 10px">Sign Out</button>
-            </div>
-            <div>
-                <label for="to">To</label>
-                <input type="username" class="form-control" id="to_box" placeholder="Jennifer">
-                <!-- <small id="usernameHelp" class="text-muted">This will appear with your messages.</small> -->
-            </div>
-            <div>
-                <button class="btn btn-primary" id="load-button" style="margin: 10px">Load</button>
-            </div>
-        </div>
 
-        <div class="jumbotron main-space">
-            <table>
-                <tr>
-                    <td style="width: 20%;">
-                        <div id="contact-list" class="container scroll-view">
+            <div class="main-space">
+                <table>
+                    <tr>
+                        <td style="width: 20%;">
+                            <div id="contact-list" class="container scroll-view">
 
-                        </div>
-                    </td>
-                    <td style="width: 80%;">
-                        <div id="chat_window" class="container scroll-view">
+                            </div>
+                        </td>
+                        <td style="width: 80%;">
+                            <div id="chat_window" class="container scroll-view">
 
-                        </div>
-                    </td>
-                </tr>
-            </table>
-            <div class="footer">
-                <input class="form-control" id="message_box" placeholder="Type a message">
-                <button class="btn btn-primary send-button" id="send-button" disabled>Send</button>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+                <div class="footer">
+                    <input class="form-control" id="message_box" placeholder="Type a message">
+                    <button class="btn btn-primary send-button" id="send-button" disabled>Send</button>
+                </div>
             </div>
         </div>
     </div>
