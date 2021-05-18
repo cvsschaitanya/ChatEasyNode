@@ -70,7 +70,7 @@ router.post("/signin", function (req, res) {
 				if (error != null) console.log("Error:" + error);
 				else if (rows.length == 0) {
 					res.status(404);
-					res.send("No such user");
+					res.send({ message: "No such user" });
 				} else {
 					bcrypt.compare(
 						password,
@@ -84,11 +84,11 @@ router.post("/signin", function (req, res) {
 
 							if (result) {
 								req.session.username = username;
-								res.send("OK cool!");
+								res.send({ response: "OK cool!" });
 								// res.redirect("/chat");
 							} else {
 								res.status(403);
-								res.send("Wrong password");
+								res.send({ response: "Wrong password" });
 							}
 						}
 					);
@@ -110,7 +110,7 @@ router.post("/register", function (req, res) {
 				if (error != null) console.log("Error:" + error);
 				else if (rows.length > 0) {
 					res.status(409);
-					res.send("Username exists");
+					res.send({ response: "Username exists" });
 				} else {
 					req.session.username = username;
 
@@ -138,7 +138,7 @@ router.post("/register", function (req, res) {
 									}
 								);
 							});
-							res.send("OK cool!");
+							res.send({ response: "OK cool!" });
 							// res.redirect("/chat");
 						}
 					);
@@ -147,8 +147,6 @@ router.post("/register", function (req, res) {
 		);
 	});
 });
-
-// app.use(theCookieParser());
 
 app.use("/public", express.static("public"));
 app.use("/static", express.static("build/static"));
