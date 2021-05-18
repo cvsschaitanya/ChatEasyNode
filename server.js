@@ -54,6 +54,20 @@ router.get("/signout", function (req, res) {
 	});
 });
 
+router.get("/delete", function (req, res) {
+	let username = req.session.username;
+	db.serialize(() => {
+		db.run("DELETE FROM _USERS WHERE username = ?;", [username], (err) => {
+			if (err) {
+				console.error(err.message);
+			} else {
+				console.log(`${username} deleted.`);
+				res.redirect("/signout");
+			}
+		});
+	});
+});
+
 router.get("/other", function (req, res) {
 	res.sendFile(path.join(__dirname, "build/index.html"));
 });
@@ -134,6 +148,11 @@ router.post("/register", function (req, res) {
 											console.log(
 												`New user ${username} added.`
 											);
+											// for ([key, val] of Object.entries(
+											// 	socketOf
+											// )) {
+											// 	val.emit("re-init");
+											// }
 										}
 									}
 								);
@@ -224,8 +243,6 @@ io.on("connection", (sock) => {
 	});
 
 	sock.on("init", (data) => {
-		// console.log(this);
-
 		db.serialize(() => {
 			db.all("SELECT username FROM _USERS;", [], (err, rows) => {
 				let users = [];
