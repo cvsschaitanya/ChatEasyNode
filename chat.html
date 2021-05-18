@@ -181,7 +181,7 @@
             itemList: [],
             activeItemIndex: -1,
 
-            addItem: (username) => {
+            addItem: function (username) {
                 var listitem = document.createElement("div");
                 listitem.href = "#";
                 listitem.username = username;
@@ -200,7 +200,7 @@
                 });
                 this.itemList.push(listitem);
                 this.element.appendChild(listitem);
-            },
+            }
         }
 
         contact_list_view.element.style.height = chats.style.height = (window.innerHeight - header.offsetHeight - footer.offsetHeight - 150) + "px";
