@@ -62,6 +62,7 @@ router.get("/delete", function (req, res) {
 				console.error(err.message);
 			} else {
 				console.log(`${username} deleted.`);
+				io.emit("re-init");
 				res.redirect("/signout");
 			}
 		});
@@ -148,11 +149,8 @@ router.post("/register", function (req, res) {
 											console.log(
 												`New user ${username} added.`
 											);
-											// for ([key, val] of Object.entries(
-											// 	socketOf
-											// )) {
-											// 	val.emit("re-init");
-											// }
+											// console.log(sockets);
+											io.emit("re-init");
 										}
 									}
 								);
@@ -202,9 +200,9 @@ function addChat(chat) {
 }
 
 socketOf = {};
+sockets = [];
 userOf = {};
 sessionOf = {};
-var myip;
 
 var sharedSession = require("express-socket.io-session");
 io.use(sharedSession(session));
@@ -226,6 +224,7 @@ io.on("connection", (sock) => {
 
 	userOf[sock["id"]] = username;
 	socketOf[username] = sock;
+	sockets.push(sock);
 	sessionOf[username] = sock.handshake.session.id;
 
 	sock.on("disconnect", () => {
@@ -234,6 +233,8 @@ io.on("connection", (sock) => {
 		if (userOf[sock["id"]]) delete userOf[sock["id"]];
 		if (sessionOf[username]) delete sessionOf[username];
 		if (username) console.log(username + " disconnected");
+		let i = sockets.indexOf(sock);
+		sockets.splice(i);
 	});
 
 	sock.on("message", function (data) {

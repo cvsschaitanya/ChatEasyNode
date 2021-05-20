@@ -178,6 +178,7 @@
 
         contact_list_view = {
             element: document.querySelector("#contact-list"),
+            contacts: [],
             itemList: [],
             activeItemIndex: -1,
 
@@ -200,6 +201,20 @@
                 });
                 this.itemList.push(listitem);
                 this.element.appendChild(listitem);
+            },
+
+            update: function () {
+                let selected = this.activeItemIndex >= 0 ? this.itemList[this.activeItemIndex].innerText : null;
+                this.element.innerHTML = "";
+                this.itemList = [];
+
+                for (let i = 0; i < this.contacts.length; i++) {
+                    this.addItem(this.contacts[i]);
+                    if (this.contacts[i] === selected) {
+                        this.itemList[i].click();
+                        this.itemList[i].classList.add('active');
+                    }
+                }
             }
         }
 
@@ -208,11 +223,11 @@
         socket.on('init-reply', (data) => {
             console.log('Your name is ' + data['name'])
             fromBox.value = data['name'];
-            data['contacts'].forEach((name) => {
-                contact_list_view.addItem(name);
-            });
+            contact_list_view.contacts = data['contacts'];
+            contact_list_view.update();
         });
-        socket.on('re-init', (data) => {
+        socket.on('re-init', () => {
+            console.log("RE-init requested");
             socket.emit("init");
         });
         socket.emit("init");
